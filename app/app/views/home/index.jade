@@ -1,0 +1,13 @@
+extends ../layout
+
+block content
+    .container
+        h1 Speciouss
+            small Finicky CSS
+        .data-container
+            ul.data-list
+                for item in items
+                    li
+                        a(href='/' + item.className)= item.className
+                else
+                    li No items found

@@ -1,0 +1,52 @@
+@import '../components/kube/less/kube.less';
+@import '../components/elusive-iconfont/less/elusive-webfont.less';
+@import '../components/elusive-iconfont/less/variables.less';
+
+.elicon(@content) {
+    font-family: 'Elusive-Icons';
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    content: @content;
+}
+
+.container {
+    width:  85%;
+    margin: 0 auto;
+    padding: 1.5%;
+}
+
+h1 small,
+h2 small,
+h3 small,
+h4 small,
+h5 small,
+h6 small {
+    margin-left: 1em;
+    height: 100%;
+    vertical-align: middle;
+}
+
+
+ul.data-list {
+    list-style: none;
+    margin:     0;
+}
+
+.back-btn {
+    .btn;
+    .btn-green;
+    margin-bottom: 1em;
+
+    &:before {
+        .elicon(@el-var-arrow-left);
+        margin-right: 0.5em;
+    }
+}

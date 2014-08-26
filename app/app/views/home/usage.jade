@@ -1,0 +1,28 @@
+extends ../layout
+
+block content
+    .container
+        a(href='/').back-btn Back
+        h1 #{req.cssClass.className}
+            small Class Usage
+        .data-container
+            pre= JSON.stringify(req.cssClassUse)
+            pre= proxyUrl
+            iframe(src=proxyUrl, width=900, height=600,data-element=req.cssClassUse.element)
+
+block pageScripts
+    script.
+        // Load event
+        document.addEventListener('DOMContentLoaded', function() {
+            var ifr = document.getElementsByTagName('iframe')[0];
+            ifr.addEventListener('load', function() {
+                var elementSel = ifr.getAttribute('data-element');
+                console.log("loaded IFRAME, look for ", elementSel);
+                var ifrDoc = ifr.contentDocument;
+                var elt = ifrDoc.querySelector(elementSel);
+                if (elt) {
+                    elt.scrollIntoView();
+                    elt.style.outline = '3px solid red';
+                }
+            });
+        });
