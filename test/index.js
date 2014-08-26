@@ -1,5 +1,4 @@
 var should     = require('should');
-var assert     = require('assert');
 
 var app = require('../index.js');
 
