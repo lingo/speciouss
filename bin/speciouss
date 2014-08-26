@@ -1,3 +1,5 @@
 #!/usr/bin/env node
 
-require('./index').species(process.argv[2]);
+var path = require('path');
+var index = path.resolve(path.dirname(__dirname), 'index');
+require(index).species(process.argv[2]);
