@@ -13,7 +13,7 @@ exports.index = function(req, res) {
                 throw new Error(err);
             }
             res.render('home/index', {
-                title: 'Species',
+                title: 'Speciouss',
                 items: cssclasses
             });
         });

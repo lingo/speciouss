@@ -9,7 +9,7 @@ var config = {
       name: 'app'
     },
     port: 3000,
-    db: 'mongodb://localhost/species'
+    db: 'mongodb://localhost/speciouss-dev'
   },
 
   test: {
@@ -18,7 +18,7 @@ var config = {
       name: 'app'
     },
     port: 3000,
-    db: 'mongodb://localhost/app-test'
+    db: 'mongodb://localhost/speciouss-test'
   },
 
   production: {
@@ -27,7 +27,7 @@ var config = {
       name: 'app'
     },
     port: 3000,
-    db: 'mongodb://localhost/app-production'
+    db: 'mongodb://localhost/speciouss-production'
   }
 };
 
