@@ -1,10 +1,12 @@
 'use strict';
 
 // Global logging reference, so we can swap in loggers
-var config = require('./config');
-var db = require('./database');
-var logger = config.logger;
+var config   = require('./config');
+var db       = require('./database');
+var logger   = config.logger;
 var huntsman = require('huntsman');
+
+var CSSClass = db.model('CSSClass');
 
 var ABORT = false;
 
@@ -13,54 +15,8 @@ process.on('SIGINT', function() {
 	ABORT = true;
 });
 
-function getCSSPath(elt, $) {
-	var sels = [];
-	sels.push(getSelector(elt, $));
-	elt.parents().each(function() {
-		sels.push(getSelector($(this), $));
-	});
-	return sels.reverse().join(' > ');
-}
+var cssdb        = require('./cssdb')(db);
 
-function getSelector(elt, $) {
-	var sel = elt[0].name.toLowerCase();
-	if (elt.attr('id')) {
-		sel += '#' + elt.attr('id');
-	}
-	if (elt.attr('class')) {
-		sel += '.' + elt.attr('class').split(/\s+/).join('.');
-	}
-	return sel;
-}
-
-
-function saveClassInfo(data) {
-	db.css.save(data, logger.debug);
-//	if (!classData[data.className]) {
-//		classData[data.className] = [];
-//	}
-//	classData[data.className].push(data);
-}
-
-/**
- *
- * Build a map of CSS data.
- *
- * classname => { element, url }
- */
-function saveClassData($, res) {
-	var allTags = $('*');
-	allTags.each(function() {
-        var classes = $(this).attr('class');
-        if (classes) {
-            var thisSel = getCSSPath($(this), $);
-            classes = classes.split(/\s+/);
-            classes.forEach(function(cls) {
-				saveClassInfo({element: thisSel, url: res.uri, className: cls});
-            });
-        }
-	});
-}
 
 function main(url) {
 	logger.debug('Beginning main(%s)', url);
@@ -79,6 +35,7 @@ function main(url) {
         //console.log(JSON.stringify(classData, null, '    '));
         origStop();
         logger.debug("STOPPING");
+        logger.log('Found CSS', cssdb.getStylesheets());
 		process.exit();
     };
 
@@ -93,14 +50,26 @@ function main(url) {
 		}
 
 		// use jquery-style selectors & functions
-		var $ = res.extension.cheerio;
-		if (typeof $ !== 'function') {
-			logger.warn('Non-html found, skipping ', res.uri);
-			return;
-		}
+        var type = res.headers['content-type'].split(/;\s*/)[0];
+        if (type === 'text/html') {
+            var $ = res.extension.cheerio;
+            if (typeof $ !== 'function') {
+                logger.warn('Non-html found, skipping ', res.uri);
+                return;
+            }
+            $('link').each(function() {
+                var $this = $(this);
+                if ($this.attr('rel') === 'stylesheet') {
+                    cssdb.saveCSSLink($this.attr('href'));
+                }
+            });
+        } else {
+            logger.warn('Non-html found, skipping ', res.uri);
+            return;
+        }
 
-		saveClassData($, res);
-		logger.debug(res.uri);
+        cssdb.saveClassData($, res);
+        logger.debug(res.uri, type);
 	});
 
 	spider.on('error', function(err, res) {
@@ -114,7 +83,5 @@ function main(url) {
 if (require.main === module || !module.parent) {
 	main(process.argv[2]);
 } else {
-	module.exports.species = main;
-	module.exports.getCSSPath = getCSSPath;
-	module.exports.getSelector = getSelector;
+	module.exports.species     = main;
 }
