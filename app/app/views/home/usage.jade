@@ -6,8 +6,12 @@ block content
         h1 #{req.cssClass.className}
             small Class Usage
         .data-container
-            pre= JSON.stringify(req.cssClassUse)
-            pre= proxyUrl
+            h2 Usage data for class: 
+                em .#{req.cssClass.className}
+            pre= JSON.stringify(req.cssClassUse, undefined, '    ')
+            p If allowed by the spidered server, the iframe below shows you where the class was found.
+            p Otherwise, look on this page:
+                a(href=req.cssClassUse.uri)= req.cssClassUse.uri
             iframe(src=proxyUrl, width=900, height=600,data-element=req.cssClassUse.element)
 
 block pageScripts

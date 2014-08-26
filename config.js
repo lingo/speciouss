@@ -1,10 +1,10 @@
 
 var config = {
-	dbURI: 'mongodb://localhost/species'
+	dbURI: 'mongodb://localhost/speciouss-dev'
 };
 
 var tracer = require('tracer').colorConsole({
-	level: 'warn',
+	level: 'debug',
 	format: [
 		'{{title}} {{message}}',
 		{

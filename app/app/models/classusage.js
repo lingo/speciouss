@@ -5,9 +5,11 @@ module.exports = function(mongoose) {
 
     var ClassUseSchema   = new mongoose.Schema({
         element: 'string',
-        uri:     'string'
+        parents: [],
+        uri:     'string',
     });
 
+	ClassUseSchema.index({ element: 1, uri: 1 });
     var ClassUse = mongoose.model('CSSClassUse', ClassUseSchema);
 
     return {

@@ -1,0 +1,14 @@
+
+.search
+	.search-form
+		form.forms(action="/search")
+			ul.forms-inline-list
+				if !query
+					- query = {search: '', parent: ''}
+				li
+					input(type='search', placeholder="class-name", name='search', value=query.search)
+				li
+					label
+						input(type='search', placeholder="parent-class-name", name='parent',value=query.parent)
+						span.btn-append
+							button.btn Go

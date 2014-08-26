@@ -9,8 +9,9 @@ module.exports = function(app){
     app.param('useID',     home.findUsage);
 
     routes.get({name: 'classes', re: '/'}, home.index);
-    routes.get({name: 'class_uses', re: '/:className'}, home.uses);
-    routes.get({name: 'class_use_show', re: '/:className/show/:useID'}, home.showUse);
+    routes.all({name: 'search', re: '/search'}, home.search);
+    routes.get({name: 'class_uses', re: '/uses/:className'}, home.uses);
+    routes.get({name: 'class_use_show', re: '/uses/:className/show/:useID'}, home.showUse);
 
     routes.all({name: 'proxy', re: '/proxy/:uri'}, home.proxy);
 

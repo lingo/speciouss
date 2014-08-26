@@ -1,0 +1,17 @@
+extends layout
+
+block content
+    .container
+        pre= JSON.stringify(queryParams, undefined, '    ')
+        a(href='/').back-btn Back
+        h1 Search results for
+            small= query.search
+        .data-container
+            ul.data-list
+                for item in items
+                    li: ul
+                        for u in item.uses
+                            li: a(href=u.uri)= u.element
+                            //- pre= JSON.stringify(u, undefined, '    ')
+                else
+                    li No items found

@@ -9,9 +9,11 @@ block content
             ul.data-list
                 for item in cssClass.get('uses')
                     li.units-row
-                        .unit-50
+                        .unit-30
                             | !{elementLink(cssClass, item)}
-                        .unit-50
+                        .unit-30
+                            | #{item.element}
+                        .unit-30
                             a(href=item.uri)= item.uri
                 else
                     li No items found

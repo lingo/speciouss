@@ -16,7 +16,7 @@ require(modelsPath)(mongoose);
 var app = express();
 
 app.locals.elementLink = function(cssClass, eltData) {
-    var link = '/' + cssClass.className + '/show/' + eltData._id;
+    var link = '/uses/' + cssClass.className + '/show/' + eltData._id;
     var shortElt = eltData.element.split(/ > /);
     shortElt = shortElt[shortElt.length-1];
     return '<a href="' + link + '" class="element" title="' + eltData.element + '">' + shortElt + '</a>';

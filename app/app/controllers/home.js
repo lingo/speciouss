@@ -67,6 +67,58 @@ exports.showUse = function(req, res) {
     });
 }
 
+var regexEscape = function(str) {
+    return (str+'').replace(/([.?*+^$\[\]\\(){}|-])/g, "\\$1");
+};
+
+
+exports.search = function(req, res, next) {
+	var search        = regexEscape(req.query.search);
+	var parent        = regexEscape(req.query.parent);
+	var matchRX       = new RegExp(search);
+	var parentMatchRX = new RegExp(parent);
+	console.log('Search for', matchRX, parentMatchRX);
+	var queryParams = {};
+	if (search) {
+		queryParams.className = matchRX;
+	}
+	if (parent) {
+		queryParams['uses.parents'] = parentMatchRX;
+	}
+	if (!Object.keys(queryParams).length) {
+		res.render('results', {
+			query: req.query,
+			items: []
+		});
+		return;
+	}
+
+	console.log('Searched for ', matchRX);
+
+	var query = CSSClass.find(queryParams).sort({className: 1});
+/*
+aggregate()
+		.match(queryParams)
+		.unwind('uses')
+		.match({ element: parentMatchRX })
+		.group({ _id: '$_id', className: '$.className', list: {$push: '$uses.element'}});
+ */
+
+	//
+	query.exec()
+		.then(function(docs) {
+			console.log(docs);
+			RegExp.prototype.toJSON = function() { return this.toString(); };
+			res.render('results', {
+				queryParams: queryParams,
+				query: req.query,
+				items:  docs
+			});
+		})
+		.then(null, function(err) {
+		    next(err);
+		});
+};
 
 exports.proxy = function(req, res) {
     if (!req.params.uri) {

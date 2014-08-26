@@ -15,7 +15,7 @@ process.on('SIGINT', function() {
 	ABORT = true;
 });
 
-var cssdb        = require('./cssdb')(db);
+var cssdb        = require('./cssdb')(db, config);
 
 
 function main(url) {
