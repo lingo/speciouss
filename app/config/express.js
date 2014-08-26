@@ -17,7 +17,8 @@ module.exports = function(app, config) {
     app.set('view engine', 'jade');
     app.use(favicon(config.root + '/public/img/favicon.png'));
     app.use(logger('dev'));
-    app.use(bodyParser());
+    app.use(bodyParser.urlencoded({ extended: true }));
+    app.use(bodyParser.json());
     app.use(methodOverride());
     app.use(session({
         secret: 'JJDd8sjHd8345J4Ns33lsKJj',
