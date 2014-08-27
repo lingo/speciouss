@@ -6,6 +6,6 @@ block content
             ul.data-list
                 for item in items
                     li
-                        a(href='/uses/' + item.className)= item.className
+                        a(href='/search?search=' + item.className)= item.className
                 else
                     li No items found

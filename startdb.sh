@@ -1,3 +1,6 @@
 #!/bin/bash
 PORT=27017
-docker run --name mongo -p $PORT:$PORT -d mongo
+DIR="$(readlink -f $(dirname $0))"
+DATADIR="/tmp/mongodata"
+mkdir $DATADIR
+docker run --name mongo -v $DATADIR:/data/db -p $PORT:$PORT -d mongo

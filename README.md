@@ -33,3 +33,6 @@ Otherwise, run your own mongodb instance.  If it's not on localhost using the de
 Pretty much everything!  So far it spiders okay and you can view the uses of the classes.
 
 More info to come..
+
+- Think about use of Arbor.js
+
