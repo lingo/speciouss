@@ -1,8 +1,10 @@
 extends ../layout
 
+block actions
+    a(href='/').back-btn Back
+
 block content
     .container
-        a(href='/').back-btn Back
         h1 #{req.cssClass.className}
             small Class Usage
         .data-container

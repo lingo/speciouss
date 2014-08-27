@@ -1,17 +1,23 @@
 extends layout
 
+block actions
+    a(href='/').back-btn Back
+
 block content
-    .container
+    .container.search-results
         pre= JSON.stringify(queryParams, undefined, '    ')
-        a(href='/').back-btn Back
         h1 Search results for
             small= query.search
         .data-container
-            ul.data-list
-                for item in items
-                    li: ul
-                        for u in item.uses
-                            li: a(href=u.uri)= u.element
-                            //- pre= JSON.stringify(u, undefined, '    ')
-                else
-                    li No items found
+            ul.data-list.search-results-list
+                each uses,classname in items
+                    li.search-result
+                        h2= classname
+                        dl
+                            for item in uses
+                                dt!= item.elementHTML
+                                    //- pre= JSON.stringify(item,null,'    ')
+
+                                dd: a(href=item.uri)= item.uri
+                            else
+                                dt No items found

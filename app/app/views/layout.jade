@@ -10,7 +10,19 @@ html(lang='en')
     block js
       script(src='http://localhost:35729/livereload.js')
   body
-    include search
+    nav.site-nav.units-row
+      h1.logo.unit-70 Spe
+        span.c c
+        | iou
+        span.s ss
+        span.logo-slogan Because CSS looked so neat at first!
+
+      include search
+
+    .actions-container.container
+      block actions
+        //- NOP
+        
     block content
 
     block pageScripts

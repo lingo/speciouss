@@ -2,8 +2,8 @@
 
 var mongoose = require('mongoose'),
     _ = require('underscore'),
-    CSSClass = mongoose.model('CSSClass'),
-    CSSClassUse = mongoose.model('CSSClassUse');
+    CSSClass = mongoose.model('CSSClass');
+    // CSSClassUse = mongoose.model('CSSClassUse');
 
 exports.index = function(req, res) {
     CSSClass.find()
@@ -37,7 +37,7 @@ exports.findClass = function(req, res, next) {
 
 exports.findUsage = function(req, res, next) {
     req.cssClassUse = _.find(req.cssClass.uses, function(x) {
-        return x._id = req.params.useID;
+        return x._id === req.params.useID;
     });
     next();
     // CSSClassUse.find({_id: req.params.useID},
@@ -56,7 +56,7 @@ exports.findUsage = function(req, res, next) {
 exports.uses = function(req, res) {
     res.render('home/uses', {
         cssClass: req.cssClass,
-    })
+    });
 };
 
 
@@ -65,25 +65,42 @@ exports.showUse = function(req, res) {
         req: req,
         proxyUrl: 'http://localhost:3000/proxy/' + encodeURIComponent(req.cssClassUse.uri)
     });
-}
+};
 
 var regexEscape = function(str) {
-    return (str+'').replace(/([.?*+^$\[\]\\(){}|-])/g, "\\$1");
+    return (str+'').replace(/([.?*+^$\[\]\\(){}|-])/g, '\\$1');
 };
 
 
 exports.search = function(req, res, next) {
-	var search        = regexEscape(req.query.search);
-	var parent        = regexEscape(req.query.parent);
-	var matchRX       = new RegExp(search);
-	var parentMatchRX = new RegExp(parent);
+    var search = req.query.search;
+    var parent = null;
+    var parts;
+    // Shall we do a descendent or child match?
+    if (search.indexOf('>') !== -1) {
+        parts  = search.split(/\s*\>\s*/);
+        search = parts.splice(-1)[0];
+        parts  = _.map(parts, regexEscape);
+        parent = parts.join('[^>]+ > '); // normalize
+    } else if(search.match(/\s/)) {
+        parts  = search.split(/\s+/);
+        search = parts.splice(-1)[0];
+        parts  = _.map(parts, regexEscape);
+        parent = parts.join('.*');
+    } else {
+        parent = null;
+        search = regexEscape(search);
+    }
+	var matchRX       = new RegExp('(' + search + ')', 'i');
+	var parentMatchRX = new RegExp('(' + parent + ')', 'i');
+
 	console.log('Search for', matchRX, parentMatchRX);
 	var queryParams = {};
 	if (search) {
 		queryParams.className = matchRX;
 	}
 	if (parent) {
-		queryParams['uses.parents'] = parentMatchRX;
+		queryParams['uses.element'] = parentMatchRX;
 	}
 	if (!Object.keys(queryParams).length) {
 		res.render('results', {
@@ -93,26 +110,41 @@ exports.search = function(req, res, next) {
 		return;
 	}
 
-	console.log('Searched for ', matchRX);
+	console.log('Searched for ', queryParams);
 
-	var query = CSSClass.find(queryParams).sort({className: 1});
-/*
-aggregate()
-		.match(queryParams)
-		.unwind('uses')
-		.match({ element: parentMatchRX })
-		.group({ _id: '$_id', className: '$.className', list: {$push: '$uses.element'}});
- */
-
-	//
-	query.exec()
-		.then(function(docs) {
-			console.log(docs);
+	CSSClass
+		.find(queryParams)
+		.sort({className: 1})
+		.exec()
+		.then(function(fullDocs) {
+			// console.log(fullDocs);
 			RegExp.prototype.toJSON = function() { return this.toString(); };
+			var matches = {};
+			fullDocs.forEach(function(doc) {
+				var uses = doc.uses;
+                if (parent) {
+                    uses =_.filter(doc.uses, function(usage) {
+    					return usage.element.match(parentMatchRX);
+                        });
+                }
+                uses.forEach(function(usage) {
+                    usage.elementHTML = usage.element
+                        .replace('html > ', '')
+                        .replace(parentMatchRX, '<span class="match parent">$1</span>')
+                        .replace(matchRX, '<span class="match classname">$1</span>');
+                });
+				console.log(doc.className, uses);
+				if (doc.className in matches) {
+					matches[doc.className] = matches[doc.className].concat(uses);
+				} else {
+					matches[doc.className] = uses;
+				}
+			});
 			res.render('results', {
 				queryParams: queryParams,
-				query: req.query,
-				items:  docs
+				query:       req.query,
+				items:       matches,
+				fullDocs:    fullDocs
 			});
 		})
 		.then(null, function(err) {
